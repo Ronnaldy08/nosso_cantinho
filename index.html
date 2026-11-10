@@ -76,6 +76,33 @@
     </div>
   </section>
 
+    <!-- FORMULÁRIO DE LEMBRANÇA -->
+  <div id="modal-memoria" class="modal oculto" role="dialog" aria-modal="true" aria-labelledby="mem-titulo-tela">
+    <form id="form-memoria" class="modal-cartao">
+      <h2 id="mem-titulo-tela" class="titulo-tela">Nova lembrança</h2>
+
+      <label for="mem-titulo">Título</label>
+      <input id="mem-titulo" type="text" maxlength="80" required>
+
+      <label for="mem-data">Data</label>
+      <input id="mem-data" type="date" required>
+
+      <label for="mem-desc">Nossa lembrança</label>
+      <textarea id="mem-desc" rows="5" maxlength="1500"></textarea>
+
+      <label for="mem-foto">Fotografia</label>
+      <input id="mem-foto" type="file" accept="image/*">
+      <img id="mem-previa" class="previa oculto" alt="Prévia da fotografia">
+
+      <p id="mem-erro" class="login-erro" role="alert"></p>
+
+      <div class="modal-botoes">
+        <button id="mem-cancelar" class="botao secundario" type="button">Cancelar</button>
+        <button id="mem-salvar" class="botao" type="submit">Salvar</button>
+      </div>
+    </form>
+  </div>
+
   <!-- PLAYER -->
   <div id="player" class="player oculto">
     <div class="player-info">
@@ -96,6 +123,7 @@
 <script src="js/app.js"></script>
 <script src="js/music.js"></script>
 <script src="js/timeline.js"></script>
+<script src="js/memories.js"></script>
 </body>
 </body>
 </body>
