@@ -57,7 +57,7 @@ function selecionar(m) {
   }
 
   player.classList.remove('oculto');
-  mostrarTela('tela-album');
+  entrarNoAlbum();
 }
 
 // Botão pausar / continuar

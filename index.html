@@ -33,16 +33,44 @@
     </div>
   </section>
 
+
+<!-- TELA: LOGIN -->
+<section id="tela-login" class="tela">
+  <form id="form-login" class="cartao-login" autocomplete="on">
+    <div class="selo">🗝️</div>
+    <h2 class="titulo-tela">A chave do cantinho</h2>
+    <p class="subtitulo-tela">só nós dois sabemos entrar</p>
+
+    <label for="login-usuario">Usuário</label>
+    <input id="login-usuario" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+
+    <label for="login-senha">Senha</label>
+    <input id="login-senha" type="password" autocomplete="current-password" required>
+
+    <p id="login-erro" class="login-erro" role="alert"></p>
+    <button id="btn-login" class="botao" type="submit">Entrar</button>
+  </form>
+</section>
+
+
   <!-- TELA 3: ÁLBUM (provisória) -->
   <section id="tela-album" class="tela">
     <header class="menu">
       <button class="menu-btn ativo" data-aba="aba-timeline" type="button">Linha temporal</button>
       <button class="menu-btn" data-aba="aba-carta" type="button">Minha carta</button>
+      <button id="btn-sair" class="menu-sair" type="button">Sair</button>
     </header>
 
-    <div id="aba-timeline" class="aba ativa">
-      <p class="provisorio">A linha temporal vai aparecer aqui. ✿</p>
-    </div>
+<div id="aba-timeline" class="aba ativa">
+  <div class="timeline-topo">
+    <h2 class="titulo-tela">Nossa história</h2>
+    <p class="subtitulo-tela">cada página guarda um pedacinho de nós</p>
+  </div>
+  <div id="timeline" class="timeline"></div>
+  <div class="timeline-fim">
+    <button id="btn-nova" class="botao" type="button">+ Adicionar uma nova lembrança</button>
+  </div>
+</div>
     <div id="aba-carta" class="aba">
       <p class="provisorio">A carta vai aparecer aqui. ✦</p>
     </div>
@@ -62,7 +90,13 @@
 
   <audio id="audio" loop preload="auto"></audio>
 
-  <script src="js/app.js"></script>
-  <script src="js/music.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script src="js/music.js"></script>
+<script src="js/timeline.js"></script>
+</body>
+</body>
 </body>
 </html>

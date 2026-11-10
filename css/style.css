@@ -262,3 +262,196 @@ body {
   cursor: pointer;
 }
 .player-btn.texto { font-family: var(--letra-manual); font-size: 1.3rem; padding: 0 12px; }
+
+/* ---------- LINHA TEMPORAL ---------- */
+.timeline-topo { max-width: 900px; margin: 0 auto 28px; }
+
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* fio vertical */
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  border-left: 3px dashed var(--marrom);
+  transform: translateX(-50%);
+}
+
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 44px 1fr;
+  align-items: center;
+  margin-bottom: 56px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.item.visivel { opacity: 1; transform: none; }
+
+.marcador {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--rosa);
+  color: var(--creme);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  border: 3px solid var(--creme);
+  box-shadow: 0 0 0 2px var(--rosa);
+  z-index: 1;
+}
+
+/* foto à esquerda, texto à direita */
+.item.foto-esq .foto-wrap  { grid-column: 1; grid-row: 1; justify-self: end; }
+.item.foto-esq .texto-wrap { grid-column: 3; grid-row: 1; }
+/* texto à esquerda, foto à direita */
+.item.foto-dir .texto-wrap { grid-column: 1; grid-row: 1; justify-self: end; text-align: right; }
+.item.foto-dir .foto-wrap  { grid-column: 3; grid-row: 1; justify-self: start; }
+
+.foto-wrap, .texto-wrap { padding: 0 14px; width: 100%; max-width: 100%; }
+
+/* foto estilo impressa (polaroid) */
+.polaroid {
+  position: relative;
+  background: var(--creme);
+  padding: 12px 12px 34px;
+  box-shadow: 0 6px 14px rgba(60, 30, 35, .3);
+  transform: rotate(var(--giro, 0deg));
+  max-width: 340px;
+  margin: 0 auto;
+}
+.polaroid img { display: block; width: 100%; height: auto; background: var(--bege); }
+
+/* fita adesiva */
+.fita {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 90px;
+  height: 26px;
+  background: rgba(181, 141, 121, .55);
+  transform: translateX(-50%) rotate(-3deg);
+  border-left: 2px dotted rgba(247, 240, 229, .7);
+  border-right: 2px dotted rgba(247, 240, 229, .7);
+}
+
+/* registro de diário */
+.registro {
+  background: var(--creme);
+  border: 1px solid var(--marrom);
+  border-left: 5px solid var(--rosa);
+  border-radius: 3px;
+  padding: 16px 18px;
+  box-shadow: 0 3px 8px rgba(113, 63, 70, .18);
+  max-width: 380px;
+  background-image: repeating-linear-gradient(transparent, transparent 31px, rgba(181, 141, 121, .25) 32px);
+}
+.item.foto-dir .registro { margin-left: auto; border-left: 1px solid var(--marrom); border-right: 5px solid var(--rosa); }
+
+.registro .data { font-family: var(--letra-manual); font-size: 1.35rem; color: var(--rosa); }
+.registro h3 { font-size: 1.5rem; line-height: 1.15; margin: 2px 0 8px; }
+.registro .desc { font-size: 1.2rem; line-height: 32px; white-space: pre-line; }
+
+.timeline-vazio { text-align: center; font-family: var(--letra-manual); font-size: 1.8rem; }
+
+.timeline-fim { text-align: center; margin-top: 8px; }
+
+/* celular: uma coluna, fio à esquerda */
+@media (max-width: 700px) {
+  .timeline::before { left: 17px; }
+  .item { grid-template-columns: 34px 1fr; align-items: start; row-gap: 14px; margin-bottom: 44px; }
+  .marcador { grid-column: 1; grid-row: 1 / span 2; width: 34px; height: 34px; justify-self: start; }
+  .item .foto-wrap,
+  .item.foto-esq .foto-wrap,
+  .item.foto-dir .foto-wrap  { grid-column: 2; grid-row: 1; justify-self: stretch; padding: 8px 0 0 10px; }
+  .item .texto-wrap,
+  .item.foto-esq .texto-wrap,
+  .item.foto-dir .texto-wrap { grid-column: 2; grid-row: 2; justify-self: stretch; text-align: left; padding: 0 0 0 10px; }
+  .polaroid { max-width: 100%; }
+  .registro, .item.foto-dir .registro { max-width: 100%; margin-left: 0; border-right: 1px solid var(--marrom); border-left: 5px solid var(--rosa); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- LOGIN ---------- */
+#tela-login.ativa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.cartao-login {
+  width: 100%;
+  max-width: 400px;
+  background: var(--creme);
+  border: 1px solid var(--marrom);
+  border-radius: 4px;
+  padding: 28px 22px 26px;
+  box-shadow: 0 8px 20px rgba(60, 30, 35, .3);
+  transform: rotate(-.6deg);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.cartao-login .selo { align-self: center; margin-bottom: 8px; }
+.cartao-login .subtitulo-tela { margin-bottom: 18px; }
+
+.cartao-login label {
+  font-family: var(--letra-manual);
+  font-size: 1.4rem;
+  color: var(--rosa);
+  margin-top: 6px;
+}
+
+.cartao-login input {
+  font-family: var(--letra-elegante);
+  font-size: 1.3rem;   /* 16px ou mais evita o zoom automático no iPhone */
+  color: var(--vinho);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--marrom);
+  padding: 8px 4px;
+  min-height: 46px;
+  outline: none;
+}
+.cartao-login input:focus { border-bottom-color: var(--vinho); }
+
+.cartao-login .botao { margin-top: 18px; align-self: center; }
+.cartao-login .botao:disabled { opacity: .6; }
+
+.login-erro {
+  min-height: 1.4em;
+  margin-top: 10px;
+  text-align: center;
+  font-family: var(--letra-manual);
+  font-size: 1.3rem;
+  color: #9b2c2c;
+}
+
+.menu-sair {
+  font-family: var(--letra-manual);
+  font-size: 1.2rem;
+  color: var(--marrom);
+  background: transparent;
+  border: none;
+  padding: 8px 10px;
+  min-height: 44px;
+  cursor: pointer;
+}
