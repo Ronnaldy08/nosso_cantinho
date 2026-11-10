@@ -1,0 +1,27 @@
+:root {
+  --bege: #E9DCC9;
+  --marrom: #B58D79;
+  --rosa: #A66F73;
+  --vinho: #713F46;
+  --creme: #F7F0E5;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bege);
+  color: var(--vinho);
+  font-family: Georgia, serif;
+  min-height: 100vh;
+}
+
+.teste {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  gap: 12px;
+}
