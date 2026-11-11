@@ -594,3 +594,14 @@ body.modal-aberto { overflow: hidden; }
   background-position: center;
   background-attachment: fixed;
 }
+
+/* ---------- PAPEL DE PAREDE DA CARTA ---------- */
+#aba-carta {
+  min-height: calc(100vh - 70px);
+  min-height: calc(100dvh - 70px);
+  background-image:
+    linear-gradient(rgba(233, 220, 201, .15), rgba(233, 220, 201, .15)),
+    url("../assets/img/papel-carta.png");
+  background-size: cover;
+  background-position: center top;
+}
