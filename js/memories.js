@@ -1,3 +1,4 @@
+
 // Adicionar, editar e excluir lembranças (com upload de foto).
 
 const memModal   = document.getElementById('modal-memoria');
@@ -12,9 +13,10 @@ const memPrevia  = document.getElementById('mem-previa');
 const memErro    = document.getElementById('mem-erro');
 const memSalvar  = document.getElementById('mem-salvar');
 
-let memEditando = null;   // lembrança que está sendo editada (ou null se for nova)
-let memFotoNova = null;   // foto já reduzida, pronta para enviar
+let memEditando = null;
+let memFotoNova = null;
 
+// Preenche a data atual ao criar uma lembrança
 function preencherDataAtual() {
   const hoje = new Date();
 
@@ -22,25 +24,6 @@ function preencherDataAtual() {
   memMes.value = hoje.getMonth() + 1;
   memAno.value = hoje.getFullYear();
 }
-
-function abrirFormulario(memoria) {
-  memEditando = memoria || null;
-  memFotoNova = null;
-  memForm.reset();
-  memErro.textContent = '';
-
-  document.getElementById('mem-titulo-tela').textContent =
-    memoria ? 'Editar lembrança' : 'Nova lembrança';
-
-   if (memoria) {
-    const [ano, mes, dia] = String(memoria.memory_date).slice(0, 10).split('-');
-
-    memAno.value = ano;
-    memMes.value = memoria.date_precision === 'ano' ? '' : Number(mes);
-    memDia.value = memoria.date_precision === 'dia' ? Number(dia) : '';
-  } else {
-    preencherDataAtual();
-  }
 
 // Valida e monta a data conforme as informações preenchidas
 function obterDataMemoria() {
@@ -50,6 +33,14 @@ function obterDataMemoria() {
 
   if (!Number.isInteger(ano) || ano < 1900 || ano > 2100) {
     throw new Error('Informe um ano válido entre 1900 e 2100.');
+  }
+
+  if (memDia.value && !dia) {
+    throw new Error('Informe um dia válido.');
+  }
+
+  if (memMes.value && (!Number.isInteger(mes) || mes < 1 || mes > 12)) {
+    throw new Error('Selecione um mês válido.');
   }
 
   if (dia && !mes) {
@@ -82,10 +73,29 @@ function obterDataMemoria() {
   return { data, precisao };
 }
 
+// Abre o formulário para criar ou editar
+function abrirFormulario(memoria) {
+  memEditando = memoria || null;
+  memFotoNova = null;
+  memForm.reset();
+  memErro.textContent = '';
+
+  document.getElementById('mem-titulo-tela').textContent =
+    memoria ? 'Editar lembrança' : 'Nova lembrança';
 
   if (memoria) {
+    const [ano, mes, dia] = String(memoria.memory_date)
+      .slice(0, 10)
+      .split('-');
+
+    memAno.value = ano;
+    memMes.value = memoria.date_precision === 'ano' ? '' : Number(mes);
+    memDia.value = memoria.date_precision === 'dia' ? Number(dia) : '';
+
     memTitulo.value = memoria.title || '';
     memDesc.value = memoria.description || '';
+  } else {
+    preencherDataAtual();
   }
 
   if (memoria && memoria.image_url) {
@@ -107,41 +117,57 @@ function fecharFormulario() {
   memFotoNova = null;
 }
 
-// Reduz a foto (celulares geram arquivos de 3 a 8 MB) e converte para JPEG
+// Reduz a foto e converte para JPEG
 function reduzirFoto(arquivo, maxLado = 1600, qualidade = 0.82) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(arquivo);
     const img = new Image();
+
     img.onload = () => {
       URL.revokeObjectURL(url);
-      const escala = Math.min(1, maxLado / Math.max(img.naturalWidth, img.naturalHeight));
+
+      const escala = Math.min(
+        1,
+        maxLado / Math.max(img.naturalWidth, img.naturalHeight)
+      );
+
       const w = Math.round(img.naturalWidth * escala);
       const h = Math.round(img.naturalHeight * escala);
+
       const canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
+
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, w, h);
       ctx.drawImage(img, 0, 0, w, h);
+
       canvas.toBlob(
-        blob => blob ? resolve(blob) : reject(new Error('Falha ao converter a foto')),
+        blob => blob
+          ? resolve(blob)
+          : reject(new Error('Falha ao converter a foto')),
         'image/jpeg',
         qualidade
       );
     };
+
     img.onerror = () => {
       URL.revokeObjectURL(url);
       reject(new Error('Não consegui ler essa foto'));
     };
+
     img.src = url;
   });
 }
 
+// Pré-visualização da fotografia
 memFoto.addEventListener('change', async () => {
   const arquivo = memFoto.files[0];
+
   memErro.textContent = '';
   memFotoNova = null;
+
   if (!arquivo) return;
 
   try {
@@ -151,12 +177,15 @@ memFoto.addEventListener('change', async () => {
   } catch (e) {
     console.error(e);
     memFoto.value = '';
-    memErro.textContent = 'Não consegui usar essa foto. Tente outra (JPG ou PNG).';
+    memErro.textContent =
+      'Não consegui usar essa foto. Tente outra (JPG ou PNG).';
   }
 });
 
+// Salvar ou atualizar lembrança
 memForm.addEventListener('submit', async (evento) => {
   evento.preventDefault();
+
   memErro.textContent = '';
   memSalvar.disabled = true;
   memSalvar.textContent = 'Salvando…';
@@ -165,21 +194,29 @@ memForm.addEventListener('submit', async (evento) => {
   let novoCaminho = null;
 
   try {
-    const { data: { user } } = await db.auth.getUser();
-    if (!user) throw new Error('Sessão expirada');
+    // Valida a data antes de enviar a fotografia
+    const dataMemoria = obterDataMemoria();
 
-    // 1) envia a foto nova (se houver)
+    const { data: { user }, error: erroUsuario } = await db.auth.getUser();
+
+    if (erroUsuario || !user) {
+      throw new Error('Sessão expirada. Entre novamente.');
+    }
+
+    // 1. Envia a foto nova, se houver
     if (memFotoNova) {
       novoCaminho = `${user.id}/${crypto.randomUUID()}.jpg`;
-      const { error } = await bucket.upload(novoCaminho, memFotoNova, { contentType: 'image/jpeg' });
+
+      const { error } = await bucket.upload(
+        novoCaminho,
+        memFotoNova,
+        { contentType: 'image/jpeg' }
+      );
+
       if (error) throw error;
     }
 
-    // 2) salva os dados
-    
-    // 2) valida e salva os dados
-    const dataMemoria = obterDataMemoria();
-
+    // 2. Prepara os dados
     const dados = {
       title: memTitulo.value.trim(),
       description: memDesc.value.trim(),
@@ -187,66 +224,113 @@ memForm.addEventListener('submit', async (evento) => {
       date_precision: dataMemoria.precisao
     };
 
-    if (novoCaminho) dados.image_path = novoCaminho;
+    if (novoCaminho) {
+      dados.image_path = novoCaminho;
+    }
 
+    // 3. Insere ou atualiza no Supabase
     const resposta = memEditando
-      ? await db.from('memories').update(dados).eq('id', memEditando.id)
+      ? await db.from('memories')
+          .update(dados)
+          .eq('id', memEditando.id)
       : await db.from('memories').insert(dados);
 
     if (resposta.error) {
-      if (novoCaminho) await bucket.remove([novoCaminho]);  // desfaz o upload
       throw resposta.error;
     }
 
-    // 3) se trocou a foto de uma lembrança existente, apaga a antiga
+    // 4. Apaga a fotografia antiga se ela foi substituída
     if (memEditando && novoCaminho && memEditando.image_path) {
       await bucket.remove([memEditando.image_path]);
     }
 
     fecharFormulario();
     await carregarLembrancas();
-  }   } catch (e) {
+
+  } catch (e) {
     console.error(e);
-    memErro.textContent = e.message || 'Não consegui salvar. Verifique a internet e tente de novo.';
+
+    // Remove a foto enviada caso o cadastro tenha falhado
+    if (novoCaminho) {
+      await bucket.remove([novoCaminho]);
+    }
+
+    memErro.textContent =
+      e.message || 'Não consegui salvar. Verifique a internet e tente de novo.';
+
   } finally {
     memSalvar.disabled = false;
     memSalvar.textContent = 'Salvar';
   }
 });
 
+// Excluir lembrança
 async function excluirMemoria(memoria) {
-  const ok = confirm(`Excluir a lembrança "${memoria.title}"?\nEssa ação não pode ser desfeita.`);
+  const ok = confirm(
+    `Excluir a lembrança "${memoria.title}"?\nEssa ação não pode ser desfeita.`
+  );
+
   if (!ok) return;
 
-  const { error } = await db.from('memories').delete().eq('id', memoria.id);
+  const { error } = await db
+    .from('memories')
+    .delete()
+    .eq('id', memoria.id);
+
   if (error) {
     console.error(error);
     alert('Não consegui excluir. Tente de novo.');
     return;
   }
+
   if (memoria.image_path) {
-    await db.storage.from('memory-photos').remove([memoria.image_path]);
+    await db.storage
+      .from('memory-photos')
+      .remove([memoria.image_path]);
   }
+
   await carregarLembrancas();
 }
 
 // Botões: adicionar, cancelar, editar e excluir
-document.getElementById('btn-nova').addEventListener('click', () => abrirFormulario(null));
-document.getElementById('mem-cancelar').addEventListener('click', fecharFormulario);
+document.getElementById('btn-nova')
+  .addEventListener('click', () => abrirFormulario(null));
+
+document.getElementById('mem-cancelar')
+  .addEventListener('click', fecharFormulario);
 
 document.getElementById('timeline').addEventListener('click', (evento) => {
   const botao = evento.target.closest('[data-acao]');
+
   if (!botao) return;
-  const memoria = memoriasAtuais.find(m => String(m.id) === botao.dataset.id);
+
+  const memoria = memoriasAtuais.find(
+    m => String(m.id) === botao.dataset.id
+  );
+
   if (!memoria) return;
-  if (botao.dataset.acao === 'editar') abrirFormulario(memoria);
-  if (botao.dataset.acao === 'excluir') excluirMemoria(memoria);
+
+  if (botao.dataset.acao === 'editar') {
+    abrirFormulario(memoria);
+  }
+
+  if (botao.dataset.acao === 'excluir') {
+    excluirMemoria(memoria);
+  }
 });
 
 // Fechar tocando fora do cartão ou com a tecla Esc
 memModal.addEventListener('click', (evento) => {
-  if (evento.target === memModal) fecharFormulario();
+  if (evento.target === memModal) {
+    fecharFormulario();
+  }
 });
+
 document.addEventListener('keydown', (evento) => {
-  if (evento.key === 'Escape' && !memModal.classList.contains('oculto')) fecharFormulario();
+  if (
+    evento.key === 'Escape' &&
+    !memModal.classList.contains('oculto')
+  ) {
+    fecharFormulario();
+  }
 });
