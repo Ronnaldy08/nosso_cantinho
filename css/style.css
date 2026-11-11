@@ -581,6 +581,6 @@ body.modal-aberto { overflow: hidden; }
   background-image: url("../assets/img/papel-login.jpg");
   background-size: cover;
   background-position: center;
-  opacity: .9;            /* aumente (ex.: .6) para aparecer mais, diminua para suavizar */
+  opacity: 1;            /* aumente (ex.: .6) para aparecer mais, diminua para suavizar */
   pointer-events: none;
 }
