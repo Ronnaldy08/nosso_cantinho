@@ -755,3 +755,26 @@ body.modal-aberto { overflow: hidden; }
 }
 .carta-corpo p { font-size: 1.3rem; }
 .carta-cabecalho h2 { font-weight: 400; font-size: 2.1rem; }
+
+/* ---------- DATA FLEXÍVEL ---------- */
+.dica { font-style: italic; font-size: 1.05rem; color: var(--marrom); margin-bottom: 2px; }
+
+.data-campos { display: grid; grid-template-columns: 1fr 2fr 1.4fr; gap: 12px; }
+.data-campos > div { display: flex; flex-direction: column; min-width: 0; }
+
+.modal-cartao input[type="number"],
+.modal-cartao select {
+  font-family: var(--letra-elegante);
+  font-size: 1.2rem;
+  color: var(--vinho);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--marrom);
+  border-radius: 0;
+  padding: 8px 4px;
+  min-height: 46px;
+  outline: none;
+  width: 100%;
+}
+.modal-cartao input[type="number"]:focus,
+.modal-cartao select:focus { border-color: var(--vinho); }
