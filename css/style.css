@@ -605,3 +605,15 @@ body.modal-aberto { overflow: hidden; }
   background-size: cover;
   background-position: center top;
 }
+
+/* ---------- NITIDEZ DOS TÍTULOS NA TELA DE MÚSICAS ---------- */
+
+.musica-wrap .titulo-tela {
+  color: #FFF8EC;
+  text-shadow: 2px 2px 5px rgba(35, 25, 15, .85);
+}
+
+.musica-wrap .subtitulo-tela {
+  color: #F7E6D2;
+  text-shadow: 1px 1px 4px rgba(35, 25, 15, .9);
+}
