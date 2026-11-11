@@ -571,3 +571,16 @@ body.modal-aberto { overflow: hidden; }
 @media (max-width: 700px) {
   .item.foto-dir .acoes { justify-content: flex-start; }
 }
+
+/* ---------- PAPEL DE PAREDE DO LOGIN ---------- */
+#tela-login::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("../assets/img/papel-login.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: .4;            /* aumente (ex.: .6) para aparecer mais, diminua para suavizar */
+  pointer-events: none;
+}
