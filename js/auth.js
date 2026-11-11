@@ -10,15 +10,11 @@ function montarEmail(usuario) {
   return u.includes('@') ? u : u + DOMINIO_EMAIL;
 }
 
-// Chamada depois de escolher a música
-async function entrarNoAlbum() {
+// Chamada ao tocar em "Abrir o presente":
+// com sessão salva vai para as músicas, sem sessão vai para o login
+async function abrirPresente() {
   const { data } = await db.auth.getSession();
-  if (data.session) {
-    mostrarTela('tela-album');
-    carregarLembrancas();
-  } else {
-    mostrarTela('tela-login');
-  }
+  mostrarTela(data.session ? 'tela-musica' : 'tela-login');
 }
 
 document.getElementById('form-login').addEventListener('submit', async (evento) => {
@@ -41,8 +37,7 @@ document.getElementById('form-login').addEventListener('submit', async (evento) 
     erro.textContent = 'Usuário ou senha incorretos.';
     return;
   }
-  mostrarTela('tela-album');
-  carregarLembrancas();
+  mostrarTela('tela-musica');
 });
 
 document.getElementById('btn-sair').addEventListener('click', async () => {
