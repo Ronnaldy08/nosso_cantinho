@@ -10,9 +10,21 @@ function escaparHtml(texto) {
   }[c]));
 }
 
-// '2026-08-16' -> '16 de agosto de 2026' (sem problema de fuso horário)
-function formatarData(iso) {
+// Formata a data conforme a precisão informada:
+// dia: 16 de agosto de 2026
+// mes: agosto de 2026
+// ano: 2026
+function formatarData(iso, precisao = 'dia') {
   const [ano, mes, dia] = String(iso).slice(0, 10).split('-').map(Number);
+
+  if (precisao === 'ano') {
+    return String(ano);
+  }
+
+  if (precisao === 'mes') {
+    return `${MESES[mes - 1]} de ${ano}`;
+  }
+
   return `${dia} de ${MESES[mes - 1]} de ${ano}`;
 }
 
@@ -84,7 +96,7 @@ function renderTimeline(memorias) {
         <span class="marcador">${ENFEITES[i % ENFEITES.length]}</span>
         <div class="texto-wrap">
           <div class="registro">
-            <p class="data">${formatarData(m.memory_date)}</p>
+            <p class="data">${formatarData(m.memory_date, m.date_precision)}</p>
             <h3>${escaparHtml(m.title)}</h3>
             <p class="desc">${escaparHtml(m.description)}</p>
           </div>

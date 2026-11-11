@@ -3,7 +3,9 @@
 const memModal   = document.getElementById('modal-memoria');
 const memForm    = document.getElementById('form-memoria');
 const memTitulo  = document.getElementById('mem-titulo');
-const memData    = document.getElementById('mem-data');
+const memDia     = document.getElementById('mem-dia');
+const memMes     = document.getElementById('mem-mes');
+const memAno     = document.getElementById('mem-ano');
 const memDesc    = document.getElementById('mem-desc');
 const memFoto    = document.getElementById('mem-foto');
 const memPrevia  = document.getElementById('mem-previa');
@@ -13,10 +15,12 @@ const memSalvar  = document.getElementById('mem-salvar');
 let memEditando = null;   // lembrança que está sendo editada (ou null se for nova)
 let memFotoNova = null;   // foto já reduzida, pronta para enviar
 
-function hojeISO() {
-  const d = new Date();
-  const p = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+function preencherDataAtual() {
+  const hoje = new Date();
+
+  memDia.value = hoje.getDate();
+  memMes.value = hoje.getMonth() + 1;
+  memAno.value = hoje.getFullYear();
 }
 
 function abrirFormulario(memoria) {
@@ -28,7 +32,57 @@ function abrirFormulario(memoria) {
   document.getElementById('mem-titulo-tela').textContent =
     memoria ? 'Editar lembrança' : 'Nova lembrança';
 
-  memData.value = memoria ? String(memoria.memory_date).slice(0, 10) : hojeISO();
+   if (memoria) {
+    const [ano, mes, dia] = String(memoria.memory_date).slice(0, 10).split('-');
+
+    memAno.value = ano;
+    memMes.value = memoria.date_precision === 'ano' ? '' : Number(mes);
+    memDia.value = memoria.date_precision === 'dia' ? Number(dia) : '';
+  } else {
+    preencherDataAtual();
+  }
+
+// Valida e monta a data conforme as informações preenchidas
+function obterDataMemoria() {
+  const ano = Number(memAno.value);
+  const mes = memMes.value ? Number(memMes.value) : null;
+  const dia = memDia.value ? Number(memDia.value) : null;
+
+  if (!Number.isInteger(ano) || ano < 1900 || ano > 2100) {
+    throw new Error('Informe um ano válido entre 1900 e 2100.');
+  }
+
+  if (dia && !mes) {
+    throw new Error('Para informar o dia, você também precisa informar o mês.');
+  }
+
+  let precisao = 'ano';
+  let data = `${ano}-01-01`;
+
+  if (mes) {
+    precisao = 'mes';
+    data = `${ano}-${String(mes).padStart(2, '0')}-01`;
+  }
+
+  if (dia) {
+    const dataTeste = new Date(ano, mes - 1, dia);
+
+    if (
+      dataTeste.getFullYear() !== ano ||
+      dataTeste.getMonth() !== mes - 1 ||
+      dataTeste.getDate() !== dia
+    ) {
+      throw new Error('Essa data não existe. Confira o dia e o mês.');
+    }
+
+    precisao = 'dia';
+    data = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+  }
+
+  return { data, precisao };
+}
+
+
   if (memoria) {
     memTitulo.value = memoria.title || '';
     memDesc.value = memoria.description || '';
@@ -122,11 +176,17 @@ memForm.addEventListener('submit', async (evento) => {
     }
 
     // 2) salva os dados
+    
+    // 2) valida e salva os dados
+    const dataMemoria = obterDataMemoria();
+
     const dados = {
       title: memTitulo.value.trim(),
       description: memDesc.value.trim(),
-      memory_date: memData.value
+      memory_date: dataMemoria.data,
+      date_precision: dataMemoria.precisao
     };
+
     if (novoCaminho) dados.image_path = novoCaminho;
 
     const resposta = memEditando
@@ -145,9 +205,9 @@ memForm.addEventListener('submit', async (evento) => {
 
     fecharFormulario();
     await carregarLembrancas();
-  } catch (e) {
+  }   } catch (e) {
     console.error(e);
-    memErro.textContent = 'Não consegui salvar. Verifique a internet e tente de novo.';
+    memErro.textContent = e.message || 'Não consegui salvar. Verifique a internet e tente de novo.';
   } finally {
     memSalvar.disabled = false;
     memSalvar.textContent = 'Salvar';

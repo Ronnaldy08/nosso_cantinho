@@ -57,7 +57,7 @@
   <section id="tela-album" class="tela">
     <header class="menu">
       <button class="menu-btn ativo" data-aba="aba-timeline" type="button">Linha temporal</button>
-      <button class="menu-btn" data-aba="aba-carta" type="button">Minha carta</button>
+      <button class="menu-btn" data-aba="aba-carta" type="button">Cartas</button>
       <button id="btn-sair" class="menu-sair" type="button">Sair</button>
     </header>
 
@@ -84,8 +84,38 @@
       <label for="mem-titulo">Título</label>
       <input id="mem-titulo" type="text" maxlength="80" required>
 
-      <label for="mem-data">Data</label>
-      <input id="mem-data" type="date" required>
+      
+<label>Quando foi?</label>
+<p class="dica">Preencha só o que você lembra. O ano é obrigatório; mês e dia são opcionais.</p>
+<div class="data-campos">
+  <div>
+    <label for="mem-dia">Dia</label>
+    <input id="mem-dia" type="number" inputmode="numeric" min="1" max="31" placeholder="—">
+  </div>
+  <div>
+    <label for="mem-mes">Mês</label>
+    <select id="mem-mes">
+      <option value="">não lembro</option>
+      <option value="1">janeiro</option>
+      <option value="2">fevereiro</option>
+      <option value="3">março</option>
+      <option value="4">abril</option>
+      <option value="5">maio</option>
+      <option value="6">junho</option>
+      <option value="7">julho</option>
+      <option value="8">agosto</option>
+      <option value="9">setembro</option>
+      <option value="10">outubro</option>
+      <option value="11">novembro</option>
+      <option value="12">dezembro</option>
+    </select>
+  </div>
+  <div>
+    <label for="mem-ano">Ano</label>
+    <input id="mem-ano" type="number" inputmode="numeric" min="1900" max="2100" required>
+  </div>
+</div>
+
 
       <label for="mem-desc">Nossa lembrança</label>
       <textarea id="mem-desc" rows="5" maxlength="1500"></textarea>
