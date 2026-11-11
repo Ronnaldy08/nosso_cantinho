@@ -7,7 +7,7 @@ function mostrarTela(id) {
 }
 
 document.getElementById('btn-abrir').addEventListener('click', () => {
-  mostrarTela('tela-musica');
+  abrirPresente();
 });
 
 // Menu do álbum (Linha temporal / Minha carta)

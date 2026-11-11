@@ -1,3 +1,4 @@
+
 // Login com Supabase Auth. A sessão fica salva no aparelho (não pede senha de novo).
 
 const DOMINIO_EMAIL = '@nossocantinho.com';
