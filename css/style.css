@@ -617,3 +617,12 @@ body.modal-aberto { overflow: hidden; }
   color: #F7E6D2;
   text-shadow: 1px 1px 4px rgba(35, 25, 15, .9);
 }
+
+/* ---------- PAPEL DE PAREDE DA CAPA ---------- */
+#tela-capa {
+  background-image:
+    linear-gradient(rgba(233, 220, 201, .15), rgba(233, 220, 201, .15)),
+    url("../assets/img/papel-capa.jpg");
+  background-size: cover;
+  background-position: center;
+}
