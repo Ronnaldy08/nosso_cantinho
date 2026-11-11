@@ -626,3 +626,48 @@ body.modal-aberto { overflow: hidden; }
   background-size: cover;
   background-position: center;
 }
+
+
+/* ---------- NOVA IDENTIDADE VISUAL DA CAPA ---------- */
+
+.capa {
+  background: #E8D1AE;
+  border-left-color: #79513D;
+  box-shadow:
+    0 14px 30px rgba(40, 25, 15, .4),
+    inset 0 0 0 6px rgba(121, 85, 59, .12);
+}
+
+/* Moldura interna */
+.capa::before {
+  border-color: rgba(121, 85, 59, .55);
+}
+
+/* Data */
+.capa-data {
+  font-family: var(--letra-elegante);
+  font-weight: 600;
+  color: #79553B;
+}
+
+/* Frase principal */
+.capa-frase {
+  font-family: var(--letra-manual);
+  color: #543B2D;
+  text-shadow: 0 1px 1px rgba(255, 248, 236, .35);
+}
+
+/* Botão */
+.capa .botao {
+  font-family: var(--letra-manual);
+  background: #79513D;
+  color: #FFF1DB;
+  border-color: #79513D;
+  box-shadow: 0 4px 0 rgba(60, 35, 22, .3);
+}
+
+/* Flores e estrelas */
+.capa .enfeite {
+  color: #946B4C;
+  opacity: .9;
+}
