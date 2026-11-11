@@ -744,3 +744,14 @@ body.modal-aberto { overflow: hidden; }
   .carta-folha { padding: 44px 20px 40px; }
   .carta-corpo p { font-size: 1.25rem; }
 }
+
+/* ---------- FONTE VINTAGE DAS CARTAS ---------- */
+.carta-folha,
+.carta-corpo p,
+.carta-cabecalho h2,
+.carta-meta,
+#carta-texto {
+  font-family: 'IM Fell English', 'Times New Roman', Times, serif;
+}
+.carta-corpo p { font-size: 1.3rem; }
+.carta-cabecalho h2 { font-weight: 400; font-size: 2.1rem; }
