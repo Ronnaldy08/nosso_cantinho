@@ -3,6 +3,8 @@
 const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
                'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
 
+let memoriasAtuais = [];
+
 // Evita que textos digitados sejam interpretados como HTML
 function escaparHtml(texto) {
   return String(texto ?? '').replace(/[&<>"']/g, c => ({
@@ -10,21 +12,11 @@ function escaparHtml(texto) {
   }[c]));
 }
 
-// Formata a data conforme a precisão informada:
-// dia: 16 de agosto de 2026
-// mes: agosto de 2026
-// ano: 2026
+// dia: 16 de agosto de 2026 | mes: agosto de 2026 | ano: 2026
 function formatarData(iso, precisao = 'dia') {
   const [ano, mes, dia] = String(iso).slice(0, 10).split('-').map(Number);
-
-  if (precisao === 'ano') {
-    return String(ano);
-  }
-
-  if (precisao === 'mes') {
-    return `${MESES[mes - 1]} de ${ano}`;
-  }
-
+  if (precisao === 'ano') return String(ano);
+  if (precisao === 'mes') return `${MESES[mes - 1]} de ${ano}`;
   return `${dia} de ${MESES[mes - 1]} de ${ano}`;
 }
 
@@ -67,6 +59,7 @@ async function carregarLembrancas() {
   }
   data.forEach(m => { m.image_url = urls[m.image_path] || null; });
 
+  memoriasAtuais = data;
   renderTimeline(data);
 }
 
@@ -99,6 +92,10 @@ function renderTimeline(memorias) {
             <p class="data">${formatarData(m.memory_date, m.date_precision)}</p>
             <h3>${escaparHtml(m.title)}</h3>
             <p class="desc">${escaparHtml(m.description)}</p>
+            <div class="acoes">
+              <button class="acao-btn" type="button" data-acao="editar" data-id="${escaparHtml(m.id)}">✎ Editar</button>
+              <button class="acao-btn perigo" type="button" data-acao="excluir" data-id="${escaparHtml(m.id)}">Excluir</button>
+            </div>
           </div>
         </div>
       </article>`;
@@ -124,8 +121,3 @@ function animarEntrada() {
   }, { threshold: 0.15 });
   itens.forEach(i => observador.observe(i));
 }
-
-// Botão de adicionar (o formulário vem na Etapa 4C)
-document.getElementById('btn-nova').addEventListener('click', () => {
-  alert('O formulário para adicionar lembranças chega na próxima etapa. ✿');
-});
