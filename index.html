@@ -71,8 +71,42 @@
     <button id="btn-nova" class="botao" type="button">+ Adicionar uma nova lembrança</button>
   </div>
 </div>
-    <div id="aba-carta" class="aba">
-      <p class="provisorio">A carta vai aparecer aqui. ✦</p>
+        <div id="aba-carta" class="aba">
+
+      <!-- Lista de cartas -->
+      <div id="cartas-lista-view">
+        <div class="timeline-topo">
+          <h2 class="titulo-tela">Nossas cartas</h2>
+          <p class="subtitulo-tela">toque em uma carta para abri-la</p>
+        </div>
+        <div id="cartas-lista" class="cartas-lista"></div>
+        <div class="timeline-fim">
+          <button id="btn-nova-carta" class="botao" type="button">+ Escrever uma carta</button>
+        </div>
+      </div>
+
+      <!-- Leitura de uma carta -->
+      <div id="carta-leitura-view" class="oculto">
+        <div class="carta-barra">
+          <button id="carta-voltar" class="acao-btn" type="button">← Voltar às cartas</button>
+        </div>
+        <article class="carta-folha">
+          <span class="carta-flor f1">✿</span>
+          <span class="carta-flor f2">❀</span>
+          <span class="carta-flor f3">✦</span>
+          <span class="carta-flor f4">✿</span>
+          <header class="carta-cabecalho">
+            <h2 id="carta-titulo-leitura"></h2>
+            <p id="carta-meta" class="carta-meta"></p>
+          </header>
+          <div id="carta-corpo" class="carta-corpo"></div>
+        </article>
+        <div id="carta-acoes" class="acoes carta-acoes oculto">
+          <button id="carta-editar" class="acao-btn" type="button">✎ Editar</button>
+          <button id="carta-excluir" class="acao-btn perigo" type="button">Excluir</button>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -129,6 +163,26 @@
       <div class="modal-botoes">
         <button id="mem-cancelar" class="botao secundario" type="button">Cancelar</button>
         <button id="mem-salvar" class="botao" type="submit">Salvar</button>
+      </div>
+    </form>
+  </div>
+
+    <!-- FORMULÁRIO DE CARTA -->
+  <div id="modal-carta" class="modal oculto" role="dialog" aria-modal="true" aria-labelledby="carta-titulo-tela">
+    <form id="form-carta" class="modal-cartao">
+      <h2 id="carta-titulo-tela" class="titulo-tela">Nova carta</h2>
+
+      <label for="carta-titulo">Título</label>
+      <input id="carta-titulo" type="text" maxlength="100" required>
+
+      <label for="carta-texto">Sua carta</label>
+      <textarea id="carta-texto" rows="12" required></textarea>
+
+      <p id="carta-erro" class="login-erro" role="alert"></p>
+
+      <div class="modal-botoes">
+        <button id="carta-cancelar" class="botao secundario" type="button">Cancelar</button>
+        <button id="carta-salvar" class="botao" type="submit">Salvar</button>
       </div>
     </form>
   </div>
