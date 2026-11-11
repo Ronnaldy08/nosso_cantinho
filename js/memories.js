@@ -1,336 +1,123 @@
+// Linha temporal: busca as lembranças no Supabase e desenha na tela.
 
-// Adicionar, editar e excluir lembranças (com upload de foto).
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+               'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
 
-const memModal   = document.getElementById('modal-memoria');
-const memForm    = document.getElementById('form-memoria');
-const memTitulo  = document.getElementById('mem-titulo');
-const memDia     = document.getElementById('mem-dia');
-const memMes     = document.getElementById('mem-mes');
-const memAno     = document.getElementById('mem-ano');
-const memDesc    = document.getElementById('mem-desc');
-const memFoto    = document.getElementById('mem-foto');
-const memPrevia  = document.getElementById('mem-previa');
-const memErro    = document.getElementById('mem-erro');
-const memSalvar  = document.getElementById('mem-salvar');
+let memoriasAtuais = [];
 
-let memEditando = null;
-let memFotoNova = null;
-
-// Preenche a data atual ao criar uma lembrança
-function preencherDataAtual() {
-  const hoje = new Date();
-
-  memDia.value = hoje.getDate();
-  memMes.value = hoje.getMonth() + 1;
-  memAno.value = hoje.getFullYear();
+// Evita que textos digitados sejam interpretados como HTML
+function escaparHtml(texto) {
+  return String(texto ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
 }
 
-// Valida e monta a data conforme as informações preenchidas
-function obterDataMemoria() {
-  const ano = Number(memAno.value);
-  const mes = memMes.value ? Number(memMes.value) : null;
-  const dia = memDia.value ? Number(memDia.value) : null;
-
-  if (!Number.isInteger(ano) || ano < 1900 || ano > 2100) {
-    throw new Error('Informe um ano válido entre 1900 e 2100.');
-  }
-
-  if (memDia.value && !dia) {
-    throw new Error('Informe um dia válido.');
-  }
-
-  if (memMes.value && (!Number.isInteger(mes) || mes < 1 || mes > 12)) {
-    throw new Error('Selecione um mês válido.');
-  }
-
-  if (dia && !mes) {
-    throw new Error('Para informar o dia, você também precisa informar o mês.');
-  }
-
-  let precisao = 'ano';
-  let data = `${ano}-01-01`;
-
-  if (mes) {
-    precisao = 'mes';
-    data = `${ano}-${String(mes).padStart(2, '0')}-01`;
-  }
-
-  if (dia) {
-    const dataTeste = new Date(ano, mes - 1, dia);
-
-    if (
-      dataTeste.getFullYear() !== ano ||
-      dataTeste.getMonth() !== mes - 1 ||
-      dataTeste.getDate() !== dia
-    ) {
-      throw new Error('Essa data não existe. Confira o dia e o mês.');
-    }
-
-    precisao = 'dia';
-    data = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-  }
-
-  return { data, precisao };
+// dia: 16 de agosto de 2026 | mes: agosto de 2026 | ano: 2026
+function formatarData(iso, precisao = 'dia') {
+  const [ano, mes, dia] = String(iso).slice(0, 10).split('-').map(Number);
+  if (precisao === 'ano') return String(ano);
+  if (precisao === 'mes') return `${MESES[mes - 1]} de ${ano}`;
+  return `${dia} de ${MESES[mes - 1]} de ${ano}`;
 }
 
-// Abre o formulário para criar ou editar
-function abrirFormulario(memoria) {
-  memEditando = memoria || null;
-  memFotoNova = null;
-  memForm.reset();
-  memErro.textContent = '';
-
-  document.getElementById('mem-titulo-tela').textContent =
-    memoria ? 'Editar lembrança' : 'Nova lembrança';
-
-  if (memoria) {
-    const [ano, mes, dia] = String(memoria.memory_date)
-      .slice(0, 10)
-      .split('-');
-
-    memAno.value = ano;
-    memMes.value = memoria.date_precision === 'ano' ? '' : Number(mes);
-    memDia.value = memoria.date_precision === 'dia' ? Number(dia) : '';
-
-    memTitulo.value = memoria.title || '';
-    memDesc.value = memoria.description || '';
-  } else {
-    preencherDataAtual();
-  }
-
-  if (memoria && memoria.image_url) {
-    memPrevia.src = memoria.image_url;
-    memPrevia.classList.remove('oculto');
-  } else {
-    memPrevia.removeAttribute('src');
-    memPrevia.classList.add('oculto');
-  }
-
-  memModal.classList.remove('oculto');
-  document.body.classList.add('modal-aberto');
+// Imagem usada quando a lembrança não tem foto
+function fotoPlaceholder() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+    <rect width="400" height="300" fill="#E9DCC9"/>
+    <rect x="12" y="12" width="376" height="276" fill="none" stroke="#B58D79" stroke-width="2" stroke-dasharray="6 6"/>
+    <text x="200" y="170" font-size="72" text-anchor="middle" fill="#A66F73">✿</text>
+  </svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
 
-function fecharFormulario() {
-  memModal.classList.add('oculto');
-  document.body.classList.remove('modal-aberto');
-  memEditando = null;
-  memFotoNova = null;
-}
+const GIROS = [-3, 2.5, -2, 3];
+const ENFEITES = ['✿', '✦', '❀', '✦'];
 
-// Reduz a foto e converte para JPEG
-function reduzirFoto(arquivo, maxLado = 1600, qualidade = 0.82) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(arquivo);
-    const img = new Image();
+// Busca no banco, gera links temporários das fotos (bucket privado) e desenha
+async function carregarLembrancas() {
+  const container = document.getElementById('timeline');
+  container.innerHTML = '<p class="timeline-vazio">Folheando as páginas… ✿</p>';
 
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-
-      const escala = Math.min(
-        1,
-        maxLado / Math.max(img.naturalWidth, img.naturalHeight)
-      );
-
-      const w = Math.round(img.naturalWidth * escala);
-      const h = Math.round(img.naturalHeight * escala);
-
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, w, h);
-      ctx.drawImage(img, 0, 0, w, h);
-
-      canvas.toBlob(
-        blob => blob
-          ? resolve(blob)
-          : reject(new Error('Falha ao converter a foto')),
-        'image/jpeg',
-        qualidade
-      );
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('Não consegui ler essa foto'));
-    };
-
-    img.src = url;
-  });
-}
-
-// Pré-visualização da fotografia
-memFoto.addEventListener('change', async () => {
-  const arquivo = memFoto.files[0];
-
-  memErro.textContent = '';
-  memFotoNova = null;
-
-  if (!arquivo) return;
-
-  try {
-    memFotoNova = await reduzirFoto(arquivo);
-    memPrevia.src = URL.createObjectURL(memFotoNova);
-    memPrevia.classList.remove('oculto');
-  } catch (e) {
-    console.error(e);
-    memFoto.value = '';
-    memErro.textContent =
-      'Não consegui usar essa foto. Tente outra (JPG ou PNG).';
-  }
-});
-
-// Salvar ou atualizar lembrança
-memForm.addEventListener('submit', async (evento) => {
-  evento.preventDefault();
-
-  memErro.textContent = '';
-  memSalvar.disabled = true;
-  memSalvar.textContent = 'Salvando…';
-
-  const bucket = db.storage.from('memory-photos');
-  let novoCaminho = null;
-
-  try {
-    // Valida a data antes de enviar a fotografia
-    const dataMemoria = obterDataMemoria();
-
-    const { data: { user }, error: erroUsuario } = await db.auth.getUser();
-
-    if (erroUsuario || !user) {
-      throw new Error('Sessão expirada. Entre novamente.');
-    }
-
-    // 1. Envia a foto nova, se houver
-    if (memFotoNova) {
-      novoCaminho = `${user.id}/${crypto.randomUUID()}.jpg`;
-
-      const { error } = await bucket.upload(
-        novoCaminho,
-        memFotoNova,
-        { contentType: 'image/jpeg' }
-      );
-
-      if (error) throw error;
-    }
-
-    // 2. Prepara os dados
-    const dados = {
-      title: memTitulo.value.trim(),
-      description: memDesc.value.trim(),
-      memory_date: dataMemoria.data,
-      date_precision: dataMemoria.precisao
-    };
-
-    if (novoCaminho) {
-      dados.image_path = novoCaminho;
-    }
-
-    // 3. Insere ou atualiza no Supabase
-    const resposta = memEditando
-      ? await db.from('memories')
-          .update(dados)
-          .eq('id', memEditando.id)
-      : await db.from('memories').insert(dados);
-
-    if (resposta.error) {
-      throw resposta.error;
-    }
-
-    // 4. Apaga a fotografia antiga se ela foi substituída
-    if (memEditando && novoCaminho && memEditando.image_path) {
-      await bucket.remove([memEditando.image_path]);
-    }
-
-    fecharFormulario();
-    await carregarLembrancas();
-
-  } catch (e) {
-    console.error(e);
-
-    // Remove a foto enviada caso o cadastro tenha falhado
-    if (novoCaminho) {
-      await bucket.remove([novoCaminho]);
-    }
-
-    memErro.textContent =
-      e.message || 'Não consegui salvar. Verifique a internet e tente de novo.';
-
-  } finally {
-    memSalvar.disabled = false;
-    memSalvar.textContent = 'Salvar';
-  }
-});
-
-// Excluir lembrança
-async function excluirMemoria(memoria) {
-  const ok = confirm(
-    `Excluir a lembrança "${memoria.title}"?\nEssa ação não pode ser desfeita.`
-  );
-
-  if (!ok) return;
-
-  const { error } = await db
+  const { data, error } = await db
     .from('memories')
-    .delete()
-    .eq('id', memoria.id);
+    .select('*')
+    .order('memory_date', { ascending: true });
 
   if (error) {
     console.error(error);
-    alert('Não consegui excluir. Tente de novo.');
+    container.innerHTML = '<p class="timeline-vazio">Não consegui carregar as lembranças. Verifique a internet e tente de novo.</p>';
     return;
   }
 
-  if (memoria.image_path) {
-    await db.storage
+  const caminhos = data.filter(m => m.image_path).map(m => m.image_path);
+  const urls = {};
+  if (caminhos.length > 0) {
+    const { data: assinadas } = await db.storage
       .from('memory-photos')
-      .remove([memoria.image_path]);
+      .createSignedUrls(caminhos, 3600);
+    (assinadas || []).forEach(a => { if (a.signedUrl) urls[a.path] = a.signedUrl; });
   }
+  data.forEach(m => { m.image_url = urls[m.image_path] || null; });
 
-  await carregarLembrancas();
+  memoriasAtuais = data;
+  renderTimeline(data);
 }
 
-// Botões: adicionar, cancelar, editar e excluir
-document.getElementById('btn-nova')
-  .addEventListener('click', () => abrirFormulario(null));
+function renderTimeline(memorias) {
+  const container = document.getElementById('timeline');
 
-document.getElementById('mem-cancelar')
-  .addEventListener('click', fecharFormulario);
-
-document.getElementById('timeline').addEventListener('click', (evento) => {
-  const botao = evento.target.closest('[data-acao]');
-
-  if (!botao) return;
-
-  const memoria = memoriasAtuais.find(
-    m => String(m.id) === botao.dataset.id
-  );
-
-  if (!memoria) return;
-
-  if (botao.dataset.acao === 'editar') {
-    abrirFormulario(memoria);
+  if (!memorias || memorias.length === 0) {
+    container.innerHTML = '<p class="timeline-vazio">Ainda não há lembranças. Que tal adicionar a primeira? ✿</p>';
+    return;
   }
 
-  if (botao.dataset.acao === 'excluir') {
-    excluirMemoria(memoria);
-  }
-});
+  // Ordem cronológica (mais antiga primeiro)
+  const ordenadas = [...memorias].sort((a, b) =>
+    String(a.memory_date).localeCompare(String(b.memory_date)));
 
-// Fechar tocando fora do cartão ou com a tecla Esc
-memModal.addEventListener('click', (evento) => {
-  if (evento.target === memModal) {
-    fecharFormulario();
-  }
-});
+  container.innerHTML = ordenadas.map((m, i) => {
+    const lado = i % 2 === 0 ? 'foto-esq' : 'foto-dir';
+    const foto = m.image_url ? escaparHtml(m.image_url) : fotoPlaceholder();
+    return `
+      <article class="item ${lado}">
+        <figure class="foto-wrap">
+          <div class="polaroid" style="--giro:${GIROS[i % GIROS.length]}deg">
+            <span class="fita"></span>
+            <img src="${foto}" alt="${escaparHtml(m.title)}" loading="lazy">
+          </div>
+        </figure>
+        <span class="marcador">${ENFEITES[i % ENFEITES.length]}</span>
+        <div class="texto-wrap">
+          <div class="registro">
+            <p class="data">${formatarData(m.memory_date, m.date_precision)}</p>
+            <h3>${escaparHtml(m.title)}</h3>
+            <p class="desc">${escaparHtml(m.description)}</p>
+            <div class="acoes">
+              <button class="acao-btn" type="button" data-acao="editar" data-id="${escaparHtml(m.id)}">✎ Editar</button>
+              <button class="acao-btn perigo" type="button" data-acao="excluir" data-id="${escaparHtml(m.id)}">Excluir</button>
+            </div>
+          </div>
+        </div>
+      </article>`;
+  }).join('');
 
-document.addEventListener('keydown', (evento) => {
-  if (
-    evento.key === 'Escape' &&
-    !memModal.classList.contains('oculto')
-  ) {
-    fecharFormulario();
+  animarEntrada();
+}
+
+// Cada lembrança aparece suavemente ao rolar a página
+function animarEntrada() {
+  const itens = document.querySelectorAll('#timeline .item');
+  if (!('IntersectionObserver' in window)) {
+    itens.forEach(i => i.classList.add('visivel'));
+    return;
   }
-});
+  const observador = new IntersectionObserver((entradas) => {
+    entradas.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visivel');
+        observador.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  itens.forEach(i => observador.observe(i));
+}
