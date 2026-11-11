@@ -584,3 +584,13 @@ body.modal-aberto { overflow: hidden; }
   opacity: 1;            /* aumente (ex.: .6) para aparecer mais, diminua para suavizar */
   pointer-events: none;
 }
+
+/* ---------- PAPEL DE PAREDE DA ESCOLHA DE MÚSICA ---------- */
+#tela-musica {
+  background-image:
+    linear-gradient(rgba(233, 220, 201, .15), rgba(233, 220, 201, .15)),
+    url("../assets/img/papel-musica.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
