@@ -845,8 +845,8 @@ body.modal-aberto { overflow: hidden; }
   box-shadow: 0 2px 4px rgba(60, 30, 35, .25);
 }
 
-/* Texto de orientação em branco */
-.dica {
-  color: #FFF8EC;
-  text-shadow: 1px 1px 3px rgba(60, 30, 35, .8);
+/* Mensagem de ausência de cartas em branco */
+#aba-carta .carta-aviso {
+  color: #FFFFFF;
+  text-shadow: 1px 2px 4px rgba(45, 25, 25, .9);
 }
