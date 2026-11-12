@@ -784,7 +784,7 @@ body.modal-aberto { overflow: hidden; }
 
 /* Título principal */
 #aba-carta .titulo-tela {
-  color: #713F46;
+  color: #ffffff;
   font-size: 2.9rem;
   font-weight: 700;
   text-shadow:
@@ -794,7 +794,7 @@ body.modal-aberto { overflow: hidden; }
 
 /* Subtítulo */
 #aba-carta .subtitulo-tela {
-  color: #713F46;
+  color: #ffffff;
   font-size: 1.25rem;
   font-weight: 600;
   text-shadow:
@@ -809,7 +809,7 @@ body.modal-aberto { overflow: hidden; }
   max-width: 95%;
   margin: 28px auto 24px;
   padding: 12px 20px;
-  color: #713F46;
+  color: #ffffff;
   background: rgba(247, 240, 229, .88);
   border: 1px solid rgba(113, 63, 70, .3);
   border-radius: 8px;
