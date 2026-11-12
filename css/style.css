@@ -844,3 +844,9 @@ body.modal-aberto { overflow: hidden; }
   transform: translateY(2px);
   box-shadow: 0 2px 4px rgba(60, 30, 35, .25);
 }
+
+/* Texto de orientação em branco */
+.dica {
+  color: #FFF8EC;
+  text-shadow: 1px 1px 3px rgba(60, 30, 35, .8);
+}
