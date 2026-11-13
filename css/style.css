@@ -850,3 +850,18 @@ body.modal-aberto { overflow: hidden; }
   color: #FFFFFF;
   text-shadow: 1px 2px 4px rgba(45, 25, 25, .9);
 }
+
+/* ---------- FOTOS DE PERSONAGENS NA CAPA ---------- */
+.capa .enfeite-foto {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #FFF1DB;
+  box-shadow: 0 3px 8px rgba(60, 35, 22, .35);
+  opacity: 1;
+}
+.capa .e1 { top: 26px;    left: 28px; }
+.capa .e2 { top: 26px;    right: 28px; }
+.capa .e3 { bottom: 26px; right: 28px; }
+.capa .e4 { bottom: 26px; left: 28px; }
