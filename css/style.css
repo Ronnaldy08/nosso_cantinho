@@ -865,3 +865,9 @@ body.modal-aberto { overflow: hidden; }
 .capa .e2 { top: 26px;    right: 28px; }
 .capa .e3 { bottom: 26px; right: 28px; }
 .capa .e4 { bottom: 26px; left: 28px; }
+
+/* ---------- MENSAGEM "AINDA NÃO HÁ CARTAS" EM BRANCO ---------- */
+#cartas-lista .timeline-vazio {
+  color: #FFFFFF;
+  text-shadow: 2px 2px 5px rgba(35, 25, 15, .85);
+}
