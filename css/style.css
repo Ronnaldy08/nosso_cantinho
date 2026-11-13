@@ -871,3 +871,15 @@ body.modal-aberto { overflow: hidden; }
   color: #FFFFFF;
   text-shadow: 2px 2px 5px rgba(35, 25, 15, .85);
 }
+
+/* ---------- FOTO NO LOGIN ---------- */
+.cartao-login .foto-login {
+  align-self: center;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid var(--creme);
+  box-shadow: 0 0 0 2px var(--rosa), 0 4px 10px rgba(60, 30, 35, .3);
+  margin-bottom: 10px;
+}
