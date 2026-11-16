@@ -41,7 +41,7 @@ const MARCADORES = [
 // Busca no banco, gera links temporários das fotos (bucket privado) e desenha
 async function carregarLembrancas() {
   const container = document.getElementById('timeline');
-  container.innerHTML = '<p class="timeline-vazio">Folheando as páginas… ✿</p>';
+  container.innerHTML = '<p class="timeline-vazio">Folheando as páginas… </p>';
 
   const { data, error } = await db
     .from('memories')
@@ -72,7 +72,7 @@ function renderTimeline(memorias) {
   const container = document.getElementById('timeline');
 
   if (!memorias || memorias.length === 0) {
-    container.innerHTML = '<p class="timeline-vazio">Ainda não há lembranças. Que tal adicionar a primeira? ✿</p>';
+    container.innerHTML = '<p class="timeline-vazio">Ainda não há lembranças. Que tal adicionar a primeira? </p>';
     return;
   }
 
