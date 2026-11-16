@@ -31,7 +31,12 @@ function fotoPlaceholder() {
 }
 
 const GIROS = [-3, 2.5, -2, 3];
-const ENFEITES = ['✿', '✦', '❀', '✦'];
+const MARCADORES = [
+  'assets/img/marcador-1.png',
+  'assets/img/marcador-2.png',
+  'assets/img/marcador-3.png',
+  'assets/img/marcador-4.png'
+];
 
 // Busca no banco, gera links temporários das fotos (bucket privado) e desenha
 async function carregarLembrancas() {
@@ -86,7 +91,7 @@ function renderTimeline(memorias) {
             <img src="${foto}" alt="${escaparHtml(m.title)}" loading="lazy">
           </div>
         </figure>
-        <span class="marcador">${ENFEITES[i % ENFEITES.length]}</span>
+        <span class="marcador"><img src="${MARCADORES[i % MARCADORES.length]}" alt=""></span>
         <div class="texto-wrap">
           <div class="registro">
             <p class="data">${formatarData(m.memory_date, m.date_precision)}</p>

@@ -883,3 +883,23 @@ body.modal-aberto { overflow: hidden; }
   box-shadow: 0 0 0 2px var(--rosa), 0 4px 10px rgba(60, 30, 35, .3);
   margin-bottom: 10px;
 }
+
+/* ---------- IMAGENS NOS MARCADORES DA LINHA TEMPORAL ---------- */
+.marcador {
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  padding: 0;
+  background: var(--creme);
+}
+.marcador img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+@media (max-width: 700px) {
+  .marcador { width: 40px; height: 40px; }
+}

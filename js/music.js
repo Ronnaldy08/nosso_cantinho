@@ -5,7 +5,8 @@ const MUSICAS = [
   { id: 'fantasmas', titulo: 'Fantasmas', artista: 'Humbe', arquivo: 'assets/music/fantasmas.mp3', simbolo: '🌙', giro: 1 },
   { id: 'velha', titulo: 'Velha Infância', artista: 'Tribalistas', arquivo: 'assets/music/velha-infancia.mp3', simbolo: '🪁', giro: -0.8 },
   { id: 'banda', titulo: 'A Banda', artista: 'Chico Buarque', arquivo: 'assets/music/a-banda.mp3', simbolo: '🎺', giro: 1.2 },
-  { id: 'alianca', titulo: 'Aliança', artista: 'Tribalistas', arquivo: 'assets/music/alianca.mp3', simbolo: '💍', giro: -1 }
+   { id: 'alianca',   titulo: 'Aliança',                 artista: 'Tribalistas',     arquivo: 'assets/music/alianca.mp3',                 simbolo: '💍', giro: -1 },
+  { id: 'cant-help', titulo: "Can't Help Falling in Love", artista: 'Elvis Presley', arquivo: 'assets/music/cant-help-falling-in-love.mp3', simbolo: '💘', giro: 0.8 }
 ];
 
 const audio = document.getElementById('audio');
